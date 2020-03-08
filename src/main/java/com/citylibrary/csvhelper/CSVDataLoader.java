@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +35,13 @@ public class CSVDataLoader {
 
     public List<LibraryItem> getLibraryItemsFromCsv() {
 
-        File datafile = new File(
-                getClass().getClassLoader().getResource(libraryConfig.getLibraryItemFileName()).getFile()
-        );
+        InputStream datafile = getClass().getClassLoader().getResourceAsStream(libraryConfig.getLibraryItemFileName());
 
         CSVReader csvReader;
         List<LibraryItem> libraryItems = new ArrayList<>();
 
         try {
-            csvReader = new CSVReaderBuilder(new FileReader(datafile))
+            csvReader = new CSVReaderBuilder(new InputStreamReader(datafile))
                     .withSkipLines(SKIP_HEADER)
                     .build();
 
@@ -92,15 +88,13 @@ public class CSVDataLoader {
 
     public List<Person> getCustomersFromCsv() {
 
-        File datafile = new File(
-                getClass().getClassLoader().getResource(libraryConfig.getCustomerFileName()).getFile()
-        );
+        InputStream datafile = getClass().getClassLoader().getResourceAsStream(libraryConfig.getCustomerFileName());
 
         CSVReader csvReader;
         List<Person> customers = new ArrayList<>();
 
         try {
-            csvReader = new CSVReaderBuilder(new FileReader(datafile))
+            csvReader = new CSVReaderBuilder(new InputStreamReader(datafile))
                     .withSkipLines(SKIP_HEADER)
                     .build();
 

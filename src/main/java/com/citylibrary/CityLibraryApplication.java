@@ -59,7 +59,7 @@ public class CityLibraryApplication implements CommandLineRunner {
     }
 
     private void returnItems() {
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CUSTOMER-1 RETURNING AN ITEM ----------------------------------------------");
         System.out.println();
 
@@ -75,7 +75,7 @@ public class CityLibraryApplication implements CommandLineRunner {
         }
 
         // Returning already returned item
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("----------------------- CUSTOMER-1 TRIES TO RETURN ALREADY RETURNED ITEM OR NOT BORROWED ITEM------------------");
         System.out.println();
 
@@ -90,7 +90,7 @@ public class CityLibraryApplication implements CommandLineRunner {
     }
 
     private void printCurrentLoanableInventory() {
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CURRENT LOANABLE INVENTORY AFTER FEW LOAN ----------------------------------------------");
         System.out.println();
 
@@ -98,7 +98,7 @@ public class CityLibraryApplication implements CommandLineRunner {
     }
 
     private void printItemsBorrowedByUsers() {
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- ITEMS BORROWED BY A CUSTOMER-1 ----------------------------------------------");
         System.out.println();
 
@@ -106,7 +106,7 @@ public class CityLibraryApplication implements CommandLineRunner {
         library.getItemBorrowedByUser(customer1).forEach(loan -> System.out.println(loan.getItem()));
 
 
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- ITEMS BORROWED BY A CUSTOMER-2 ----------------------------------------------");
         System.out.println();
 
@@ -116,7 +116,7 @@ public class CityLibraryApplication implements CommandLineRunner {
 
     private void borrowItems() {
 
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CUSTOMER-1 BORROWS ITEMS ----------------------------------------------");
         System.out.println();
 
@@ -148,7 +148,7 @@ public class CityLibraryApplication implements CommandLineRunner {
         }
 
 
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CUSTOMER-2 BORROWS AN ITEM ----------------------------------------------");
         System.out.println();
 
@@ -169,7 +169,7 @@ public class CityLibraryApplication implements CommandLineRunner {
 
         // trying to borrow already borrowed item
 
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CUSTOMER-2 TRIES TO BORROW ALREADY BORROWED ITEM ----------------------------------------------");
         System.out.println();
 
@@ -186,6 +186,7 @@ public class CityLibraryApplication implements CommandLineRunner {
     }
 
     private void printCurrentInventory() {
+        System.out.println("\n\n");
         System.out.println("---------------------------------- CURRENT INVENTORY ----------------------------------------------");
         System.out.println();
 
@@ -199,14 +200,14 @@ public class CityLibraryApplication implements CommandLineRunner {
             System.out.println("Currently Loaned:" + value.stream().filter(t -> t.getItemStatus().equals(Status.LOANED)).count());
             System.out.println("List of Library Items:");
             value.forEach(System.out::println);
-            System.out.println("------------------------------------------------------------------------------------------------------");
+            System.out.println("------------------------------------------------------------------------------------------------------\n\n");
         });
 
     }
 
 
     private void printOverDueItems() {
-        System.out.println();
+        System.out.println("\n\n");
         System.out.println("---------------------------------- PRINT OVERDUE ITEMS ----------------------------------------------");
         System.out.println();
 
