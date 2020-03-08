@@ -70,7 +70,7 @@ public class LibraryItemLendingService implements LendingService {
             String msg =
                     "Cannot return Item " + item.getLibraryId() + " " + item.getTitle()
                             + ". It has not been loaned";
-            logger.error(msg);
+            logger.info(msg);
             throw new LibraryItemNotLoanedReturnedException(msg);
         }
         return dataService.returnLoanedItem(item);

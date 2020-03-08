@@ -79,6 +79,7 @@ public class CityLibraryApplication implements CommandLineRunner {
         System.out.println("----------------------- CUSTOMER-1 TRIES TO RETURN ALREADY RETURNED ITEM OR NOT BORROWED ITEM------------------");
         System.out.println();
 
+        System.out.println(book);
         try {
             library.returnItem(book);
         } catch (LibraryItemNotLoanedReturnedException ex) {
@@ -172,6 +173,7 @@ public class CityLibraryApplication implements CommandLineRunner {
         System.out.println("---------------------------------- CUSTOMER-2 TRIES TO BORROW ALREADY BORROWED ITEM ----------------------------------------------");
         System.out.println();
 
+        System.out.println(item2);
         try {
             library.borrowItem(customer2, item2);
         } catch (LibraryItemNotFoundException ex) {
