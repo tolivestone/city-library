@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="HOME_LOG" value="logs/app.log"/>
-
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d %p %c{1.} [%t] %m%n</pattern>
-        </encoder>
-    </appender>
+    <property name="APP_LOG" value="logs/app.log"/>
 
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${HOME_LOG}</file>
+        <file>${APP_LOG}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
@@ -30,12 +24,10 @@
 
     <logger name="com.citylibrary" level="debug" additivity="false">
         <appender-ref ref="FILE-ROLLING"/>
-        <!--<appender-ref ref="CONSOLE"/>-->
     </logger>
 
     <root level="error">
         <appender-ref ref="FILE-ROLLING"/>
-        <!--<appender-ref ref="CONSOLE"/>-->
     </root>
 
 </configuration>

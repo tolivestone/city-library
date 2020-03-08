@@ -210,6 +210,9 @@ public class CityLibraryApplication implements CommandLineRunner {
         System.out.println("---------------------------------- PRINT OVERDUE ITEMS ----------------------------------------------");
         System.out.println();
 
-        library.getOverDueItems().forEach(System.out::println);
+        if(library.getOverDueItems().size()>0)
+            library.getOverDueItems().forEach(System.out::println);
+        else
+            System.out.println("Currently there are no overdue items");
     }
 }
