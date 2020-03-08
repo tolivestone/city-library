@@ -14,7 +14,7 @@ public abstract class LibraryItem implements Loanable {
     private final String description;       //optional
     private final int shelfId;               //optional
 
-    protected LibraryItem(final int libraryId, final int itemId,final  ItemType type,final String title,final String description,final int shelfId) {
+    protected LibraryItem(final int libraryId, final int itemId, final ItemType type, final String title, final String description, final int shelfId) {
         this.libraryId = libraryId;
         this.itemId = itemId;
         this.type = type;
@@ -53,7 +53,7 @@ public abstract class LibraryItem implements Loanable {
     }
 
     public final void setItemStatus(final Status itemStatus) {
-            this.itemStatus = itemStatus;
+        this.itemStatus = itemStatus;
     }
 
     @Override
@@ -90,11 +90,11 @@ public abstract class LibraryItem implements Loanable {
         private final ItemType type;
         private final String title;
         private String description = "";
-        private int ShelfId= 0;
+        private int ShelfId = 0;
 
         public LibraryItemBuilder(final int libraryId, final int itemId, final ItemType type, final String title) {
-            if(libraryId <=0 || itemId <=0 || type == null || title == null || title.isEmpty())
-                        throw new IllegalArgumentException("One or more argurment are not set or valid");
+            if (libraryId <= 0 || itemId <= 0 || type == null || title == null || title.isEmpty())
+                throw new IllegalArgumentException("One or more argurment are not set or valid");
 
             this.libraryId = libraryId;
             this.itemId = itemId;
@@ -116,16 +116,16 @@ public abstract class LibraryItem implements Loanable {
             LibraryItem item = null;
             switch (this.type) {
                 case BOOK:
-                    item = new Book(libraryId, itemId, title,description, ShelfId);
+                    item = new Book(libraryId, itemId, title, description, ShelfId);
                     break;
                 case DVD:
-                    item =  new Dvd(libraryId, itemId, title,description, ShelfId);
+                    item = new Dvd(libraryId, itemId, title, description, ShelfId);
                     break;
                 case VHS:
-                    item =  new Vhs(libraryId, itemId, title,description, ShelfId);
+                    item = new Vhs(libraryId, itemId, title, description, ShelfId);
                     break;
                 case CD:
-                    item =  new CompactDisc(libraryId, itemId, title,description, ShelfId);
+                    item = new CompactDisc(libraryId, itemId, title, description, ShelfId);
                     break;
             }
             return item;

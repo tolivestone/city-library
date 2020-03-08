@@ -111,7 +111,7 @@ public class CSVDataServiceTest {
     public void canThrowExceptionWithNullParameterToGetItemsByTitle() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> libraryCsvDataService.getItemsByTitle(null))
-                .withMessage("Invalid method parameter(s). Title cannot be null");
+                .withMessage("One or  more invalid method parameter(s) passed to getItemsByTitle. Title cannot be null");
     }
 
     @Test
@@ -135,7 +135,7 @@ public class CSVDataServiceTest {
     public void canThrowExceptionWithNullParameterToAddLibrary() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> libraryCsvDataService.addLibraryItem(null))
-                .withMessage("Invalid method parameter(s). Item cannot be null");
+                .withMessage("One or  more invalid method parameter(s) passed to addLibraryItem. Item cannot be null");
     }
 
     @Test
@@ -159,7 +159,7 @@ public class CSVDataServiceTest {
     public void canThrowExceptionWithNullParameterToRemoveLibraryItem() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> libraryCsvDataService.removeLibraryItem(null))
-                .withMessage("Invalid method parameter(s). Item cannot be null");
+                .withMessage("One or  more invalid method parameter(s) passed to removeLibraryItem. Item cannot be null");
     }
 
     @Test

@@ -10,5 +10,6 @@ import java.time.LocalDate;
 
 public interface LendingService {
     boolean borrowItem(Person customer, LibraryItem item, LocalDate issueDate, LocalDate dueDate) throws LibraryItemNotLoanableException, LibraryItemNotFoundException;
+
     boolean returnItem(LibraryItem item) throws LibraryOperationException;
 }

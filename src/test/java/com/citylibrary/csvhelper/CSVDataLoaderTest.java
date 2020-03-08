@@ -10,10 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-class CsvDataLoaderTest {
+class CSVDataLoaderTest {
 
     @Autowired
-    private CsvDataLoader csvReader;
+    private CSVDataLoader csvReader;
 
     @Test
     void canGetLibraryItemsFromCsv() {

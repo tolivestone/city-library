@@ -79,6 +79,25 @@ public class LibraryTest {
         verify(mockDataService, atMost(INVOKED_ONCE)).getCurrentInventory();
     }
 
+
+    @Test
+    public void canGetCurrentLoanableInventory() {
+
+        //Given
+        when(mockDataService.getCurrentLoanableInventory()).thenReturn(items);
+
+        //When
+        List<LibraryItem> currentInventory = library.getCurrentLoanableInventory();
+
+        //Then
+        Assertions.assertThat(currentInventory)
+                .isNotEmpty()
+                .hasSize(SIZE_FIVE)
+                .allMatch(item -> item.getItemStatus().equals(Status.AVAILABLE));
+
+        verify(mockDataService, atMost(INVOKED_ONCE)).getCurrentLoanableInventory();
+    }
+
     @Test
     public void canGetEmptyCurrentInventory() {
 
@@ -96,7 +115,7 @@ public class LibraryTest {
     }
 
     @Test
-    public void canborrowAvailableItem() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
+    public void canBorrowAvailableItem() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
 
         //Given
         LibraryItem item = items.get(0);
@@ -170,7 +189,8 @@ public class LibraryTest {
         //Then
         Assertions.assertThat(overDueItems)
                 .isNotEmpty()
-                .hasSize(SIZE_TWO);
+                .hasSize(SIZE_TWO)
+                .allMatch(loan -> loan.getDueDate().isBefore(LocalDate.now()));         //checks due date is in the past
 
         verify(mockDataService, atMost(INVOKED_ONCE)).getLoan();
     }
@@ -187,7 +207,8 @@ public class LibraryTest {
         //Then
         Assertions.assertThat(borrowedItems)
                 .isNotEmpty()
-                .hasSize(SIZE_THREE);
+                .hasSize(SIZE_THREE)
+                .allMatch(loan -> loan.getCustomer().equals(customerOne));
 
         verify(mockDataService, atMost(INVOKED_ONCE))
                 .getLoan();

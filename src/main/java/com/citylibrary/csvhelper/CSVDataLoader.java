@@ -8,7 +8,6 @@ import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +22,20 @@ import java.util.List;
 import static com.citylibrary.constant.Constant.*;
 
 @Component
-public class CsvDataLoader {
+public class CSVDataLoader {
 
     private LibraryConfig libraryConfig;
 
+    // constructor injection gives an opportunity to mock and run unit tests outside spring framework
     @Autowired
-    public CsvDataLoader(LibraryConfig libraryConfig) {
+    public CSVDataLoader(final LibraryConfig libraryConfig) {
         this.libraryConfig = libraryConfig;
     }
 
     private static final Logger logger
             = LoggerFactory.getLogger(CityLibraryApplication.class);
 
-    public List<LibraryItem> getLibraryItemsFromCsv(){
+    public List<LibraryItem> getLibraryItemsFromCsv() {
 
         File datafile = new File(
                 getClass().getClassLoader().getResource(libraryConfig.getLibraryItemFileName()).getFile()
@@ -44,18 +44,18 @@ public class CsvDataLoader {
         CSVReader csvReader;
         List<LibraryItem> libraryItems = new ArrayList<>();
 
-        try{
+        try {
             csvReader = new CSVReaderBuilder(new FileReader(datafile))
                     .withSkipLines(SKIP_HEADER)
                     .build();
 
             List<String[]> records = csvReader.readAll();
-            for(String[] record: records) {
+            for (String[] record : records) {
 
                 switch (record[2].toUpperCase()) {
                     case "BOOK":
                         LibraryItem book = new LibraryItem.LibraryItemBuilder(
-                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]),ItemType.BOOK,record[ITEM_TITLE])
+                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]), ItemType.BOOK, record[ITEM_TITLE])
                                 .withDescription("Description for " + record[ITEM_TITLE])
                                 .build();
 
@@ -64,7 +64,7 @@ public class CsvDataLoader {
 
                     case "DVD":
                         LibraryItem dvd = new LibraryItem.LibraryItemBuilder(
-                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]),ItemType.DVD,record[ITEM_TITLE])
+                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]), ItemType.DVD, record[ITEM_TITLE])
                                 .withDescription("Description for " + record[ITEM_TITLE])
                                 .build();
 
@@ -73,7 +73,7 @@ public class CsvDataLoader {
 
                     case "VHS":
                         LibraryItem vhs = new LibraryItem.LibraryItemBuilder(
-                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]),ItemType.VHS,record[ITEM_TITLE])
+                                Integer.parseInt(record[LIBRARY_ID]), Integer.parseInt(record[ITEM_ID]), ItemType.VHS, record[ITEM_TITLE])
                                 .withDescription("Description for " + record[ITEM_TITLE])
                                 .build();
 
@@ -81,13 +81,16 @@ public class CsvDataLoader {
                         break;
                 }
             }
-        } catch (IOException ex){
+        } catch (IOException ex) {
             logger.error("Error loading library items from CSV " + ex.getMessage());
+        } catch (Exception ex) {
+            logger.error("Unknown error occurred while loading library items from CSV " + ex.getMessage());
         }
+
         return libraryItems;
     }
 
-    public List<Person> getCustomersFromCsv(){
+    public List<Person> getCustomersFromCsv() {
 
         File datafile = new File(
                 getClass().getClassLoader().getResource(libraryConfig.getCustomerFileName()).getFile()
@@ -96,20 +99,22 @@ public class CsvDataLoader {
         CSVReader csvReader;
         List<Person> customers = new ArrayList<>();
 
-        try{
+        try {
             csvReader = new CSVReaderBuilder(new FileReader(datafile))
-                    .withSkipLines(1)
+                    .withSkipLines(SKIP_HEADER)
                     .build();
 
             List<String[]> records = csvReader.readAll();
-            for(String[] record: records) {
+            for (String[] record : records) {
                 Person customer = new Customer(
                         Integer.parseInt(record[CUSTOMER_ID]), record[CUSTOMER_FIRST_NAME], record[CUSTOMER_LAST_NAME]);
 
                 customers.add(customer);
             }
-        } catch (IOException ex){
+        } catch (IOException ex) {
             logger.error("Error loading customer data from CSV " + ex.getMessage());
+        } catch (Exception ex) {
+            logger.error("Unknown error occurred while customer data from CSV " + ex.getMessage());
         }
         return customers;
     }

@@ -14,7 +14,7 @@ public class LibraryConfig {
         return customerFileName;
     }
 
-    public void setCustomerFileName(String customerFileName) {
+    public void setCustomerFileName(final String customerFileName) {
         this.customerFileName = customerFileName;
     }
 
@@ -22,7 +22,7 @@ public class LibraryConfig {
         return libraryItemFileName;
     }
 
-    public void setLibraryItemFileName(String libraryItemFileName) {
+    public void setLibraryItemFileName(final String libraryItemFileName) {
         this.libraryItemFileName = libraryItemFileName;
     }
 }

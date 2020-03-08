@@ -6,7 +6,7 @@ import com.citylibrary.enums.Status;
 public final class Book extends LibraryItem {
 
     protected Book(final int libraryId, final int itemId, final String title, final String description, final int shelfId) {
-        super(libraryId,itemId, ItemType.BOOK, title,description, shelfId);
+        super(libraryId, itemId, ItemType.BOOK, title, description, shelfId);
     }
 
     @Override

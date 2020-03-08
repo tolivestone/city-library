@@ -5,8 +5,8 @@ import com.citylibrary.enums.Status;
 
 public final class Dvd extends LibraryItem {
 
-    protected Dvd(final int libraryId, final int itemId,final String title, final String description, final int shelfId) {
-        super(libraryId,itemId, ItemType.DVD, title, description,shelfId);
+    protected Dvd(final int libraryId, final int itemId, final String title, final String description, final int shelfId) {
+        super(libraryId, itemId, ItemType.DVD, title, description, shelfId);
     }
 
     @Override

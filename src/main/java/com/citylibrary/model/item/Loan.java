@@ -1,6 +1,7 @@
 package com.citylibrary.model.item;
 
 import com.citylibrary.model.actor.Person;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ public final class Loan {
     private final LocalDate dueDate;
 
 
-    public Loan(final Person customer, final  LibraryItem item, final LocalDate issueDate, final LocalDate dueDate) {
+    public Loan(final Person customer, final LibraryItem item, final LocalDate issueDate, final LocalDate dueDate) {
         this.customer = customer;
         this.item = item;
         this.issueDate = issueDate;

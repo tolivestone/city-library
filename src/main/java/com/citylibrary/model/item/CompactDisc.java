@@ -6,7 +6,7 @@ import com.citylibrary.enums.Status;
 public class CompactDisc extends LibraryItem {
 
     protected CompactDisc(final int libraryId, final int itemId, final String title, final String description, final int shelfId) {
-        super(libraryId,itemId, ItemType.CD, title,description, shelfId);
+        super(libraryId, itemId, ItemType.CD, title, description, shelfId);
     }
 
     @Override
