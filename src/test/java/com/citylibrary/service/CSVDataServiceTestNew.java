@@ -1,5 +1,6 @@
 package com.citylibrary.service;
 
+import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.db.DataStore;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
@@ -33,14 +34,14 @@ public class CSVDataServiceTestNew {
 
         List<LibraryItem> items = getLibraryItemList();
 
-        items.parallelStream().forEach(item-> CSVDataService.addLibraryItem(item));
+        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
 
         //Checking inventory
         Assertions.assertThat(CSVDataService.getCurrentInventory())
                 .isNotEmpty()
                 .hasSize(5)
                 .doesNotContainNull()
-                .allMatch(d->d.getItemStatus() == Status.AVAILABLE);
+                .allMatch(d -> d.getItemStatus() == Status.AVAILABLE);
 
         //Checking inventory with loaned items
         items.get(0).setItemStatus(Status.LOANED);
@@ -50,26 +51,26 @@ public class CSVDataServiceTestNew {
                 .isNotEmpty()
                 .hasSize(5)
                 .doesNotContainNull()
-                .anyMatch(d->d.getItemStatus() == Status.LOANED);
+                .anyMatch(d -> d.getItemStatus() == Status.LOANED);
     }
 
     private List<LibraryItem> getLibraryItemList() {
         return List.of(
-                new LibraryItem.LibraryItemBuilder(1,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(2,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(3,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(4,2, ItemType.DVD, "Pi").build(),
-                new LibraryItem.LibraryItemBuilder(5,3, ItemType.DVD, "Frozen").build()
+                new LibraryItem.LibraryItemBuilder(1, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                new LibraryItem.LibraryItemBuilder(2, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                new LibraryItem.LibraryItemBuilder(3, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                new LibraryItem.LibraryItemBuilder(4, 2, ItemType.DVD, "Pi").build(),
+                new LibraryItem.LibraryItemBuilder(5, 3, ItemType.DVD, "Frozen").build()
         );
     }
 
 
-   /* @Test
+    @Test
     public void getCurrentLoanableInventory() {
 
         List<LibraryItem> items = getLibraryItemList();
 
-        items.parallelStream().forEach(item-> CSVDataService.addLibraryItem(item));
+        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
 
         //Checking inventory with loaned items
         items.get(0).setItemStatus(Status.LOANED);
@@ -80,7 +81,7 @@ public class CSVDataServiceTestNew {
                 .hasSize(3)
                 .extracting("itemStatus")
                 .doesNotContain(Status.LOANED)
-                .allMatch(d->d.equals(Status.AVAILABLE));
+                .allMatch(d -> d.equals(Status.AVAILABLE));
     }
 
     @Test
@@ -88,13 +89,13 @@ public class CSVDataServiceTestNew {
 
         List<LibraryItem> items = getLibraryItemList();
 
-        items.parallelStream().forEach(item-> CSVDataService.addLibraryItem(item));
+        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
 
-        Assertions.assertThat(CSVDataService.searchItemsByTitle("Introduction to Algorithms"))
+        Assertions.assertThat(CSVDataService.getItemsByTitle("Introduction to Algorithms"))
                 .isNotEmpty()
                 .hasSize(3)
                 .flatExtracting(LibraryItem::getTitle)
-                .allMatch(d->d.equals("Introduction to Algorithms"));
+                .allMatch(d -> d.equals("Introduction to Algorithms"));
     }
 
     @Test
@@ -102,42 +103,34 @@ public class CSVDataServiceTestNew {
 
         List<LibraryItem> items = getLibraryItemList();
 
-        items.parallelStream().forEach(item-> CSVDataService.addLibraryItem(item));
+        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
 
-        Assertions.assertThat(CSVDataService.searchItemsByTitle("Fake title"))
+        Assertions.assertThat(CSVDataService.getItemsByTitle("Fake title"))
                 .isEmpty();
     }
 
     @Test
     public void addItem_happyPath() {
 
-        Assertions.assertThat(CSVDataService.searchItemsByLibraryId(1))
-                .isEmpty();
 
         LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1,2,ItemType.VHS,"WarGames").build();
+                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
 
-        boolean isAdded = CSVDataService.addLibraryItem(vhs);
+        CSVDataService.addLibraryItem(vhs);
 
-        Assertions.assertThat(isAdded)
-                .isEqualTo(true);
-
-        Assertions.assertThat(CSVDataService.searchItemsByLibraryId(1))
-                .isNotEmpty()
-                .hasSize(1)
-                .contains(vhs)
-                .flatExtracting(LibraryItem::getTitle)
-                .allMatch(d-> d.equals("WarGames"));
+        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
+                .isNotNull()
+                .isEqualTo(vhs);
     }
 
     @Test
     public void add_withNullParameter() {
 
-        Assertions.assertThat(CSVDataService.searchItemsByLibraryId(1))
-                .isEmpty();
+        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
+                .isNull();
 
         Assertions.assertThatNullPointerException()
-                .isThrownBy(()-> CSVDataService.addLibraryItem(null))
+                .isThrownBy(() -> CSVDataService.addLibraryItem(null))
                 .withMessage("Item cannot be null");
     }
 
@@ -145,31 +138,29 @@ public class CSVDataServiceTestNew {
     public void removeItem_happyPath() throws LibraryOperationException {
 
         LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1,2,ItemType.VHS,"WarGames").build();
+                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
 
         CSVDataService.addLibraryItem(vhs);
 
-        Assertions.assertThat(CSVDataService.searchItemsByLibraryId(1))
-                .isNotEmpty()
-                .hasSize(1)
-                .contains(vhs)
-                .flatExtracting(LibraryItem::getTitle)
-                .allMatch(d-> d.equals("WarGames"));
+        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
+                .isNotNull()
+                .isEqualTo(vhs);
+
 
         boolean isRemoved = CSVDataService.removeLibraryItem(vhs);
 
         Assertions.assertThat(isRemoved)
                 .isEqualTo(true);
 
-        Assertions.assertThat(CSVDataService.searchItemsByLibraryId(1))
-                .isEmpty();
+        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
+                .isNull();
     }
 
     @Test
     public void remove_withNullParameter() {
 
-        Assertions.assertThatNullPointerException()
-                .isThrownBy(()-> CSVDataService.removeLibraryItem(null))
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> CSVDataService.removeLibraryItem(null))
                 .withMessage("Item cannot be null");
     }
 
@@ -180,25 +171,15 @@ public class CSVDataServiceTestNew {
                 .isEmpty();
 
         LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1,2,ItemType.VHS,"WarGames").build();
+                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
 
         Assertions.assertThatExceptionOfType(LibraryOperationException.class)
-                .isThrownBy(()-> CSVDataService.removeLibraryItem(vhs))
+                .isThrownBy(() -> CSVDataService.removeLibraryItem(vhs))
                 .withMessage("Item does not exist");
     }
 
 
-     private List<LibraryItem> getLibraryItemList() {
-         return List.of(
-                 new LibraryItem.LibraryItemBuilder(1,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                 new LibraryItem.LibraryItemBuilder(2,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                 new LibraryItem.LibraryItemBuilder(3,1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                 new LibraryItem.LibraryItemBuilder(4,2, ItemType.DVD, "Pi").build(),
-                 new LibraryItem.LibraryItemBuilder(5,3, ItemType.DVD, "Frozen").build()
-         );
-     }
-
     @Test
     public void isBorrowed() {
-    }*/
+    }
 }

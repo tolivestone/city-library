@@ -6,6 +6,8 @@ import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CSVDataService implements DataService {
 
     @Autowired
@@ -84,6 +87,9 @@ public class CSVDataService implements DataService {
 
     @Override
     public boolean removeLibraryItem(final LibraryItem item) {
+        if(item == null)
+            throw new IllegalArgumentException("Item cannot be null");
+
         return dataStore.getLibraryItems().remove(item.getLibraryId(), item);
     }
 

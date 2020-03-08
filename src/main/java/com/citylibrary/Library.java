@@ -9,7 +9,6 @@ import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
 import com.citylibrary.service.DataService;
 import com.citylibrary.service.LendingService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
@@ -80,11 +79,15 @@ public final class Library {
                 .anyMatch(item->item.equals(libraryItem) && item.getType() == ItemType.BOOK);
     }
 
-    public LibraryItem findItemByTitleAndType(String title, ItemType itemType) {
+    public LibraryItem getItemByTitleAndType(String title, ItemType itemType) {
         return
                 dataService.getCurrentInventory()
                 .parallelStream()
                 .filter(item-> item.getTitle().contains(title) && item.getType().equals(itemType))
                 .findFirst().get();
+    }
+
+    public LibraryItem getItemByLibraryId(int libraryId) {
+        return dataService.getItemsByLibraryId(libraryId);
     }
 }

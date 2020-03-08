@@ -40,13 +40,14 @@ public class LibraryItemLendingService implements LendingService{
         if(item == null) throw new IllegalArgumentException("Item cannot be null");
 
         if(!isItemLoaned(item))
-            throw new LibraryOperationException("Cannot return Item "+ item.getLibraryId() + " " + item.getTitle() + " It has not been loaned");
+            throw new LibraryOperationException("Cannot return Item "+ item.getLibraryId() + " " + item.getTitle() + ". It has not been loaned");
 
         return dataService.returnLoanedItem(item);
     }
 
     private boolean isItemLoaned(LibraryItem item) {
-        return dataService.getLoan().contains(item);
+        return dataService.getLoan().parallelStream()
+                .anyMatch(loan -> loan.getItem().equals(item));
     }
 
 }

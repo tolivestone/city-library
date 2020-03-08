@@ -1,9 +1,11 @@
 package com.citylibrary;
 
+import com.citylibrary.businessexception.LibraryItemNotFoundException;
+import com.citylibrary.businessexception.LibraryItemNotLoanableException;
+import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
-import com.citylibrary.model.item.Loanable;
 import com.citylibrary.service.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,7 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,17 +59,34 @@ public class CityLibraryApplication implements CommandLineRunner {
 
 	private void returnItems() {
 		System.out.println();
-		System.out.println("**************************** CUSTOMER-1 RETURNING AN ITEM *************************************");
+		System.out.println("---------------------------------- CUSTOMER-1 RETURNING AN ITEM ----------------------------------------------");
 		System.out.println();
 
-		LibraryItem book = library.getCurrentInventory().get(5);
+
+		LibraryItem book = library.getItemByLibraryId(1);;
 		System.out.println(book);
-		library.returnItem(book);
+		try {
+			library.returnItem(book);
+		}catch (LibraryOperationException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while returning library item. " + ex.getMessage());
+		}
+
+		// Returning already returned item
+
+		try {
+			library.returnItem(book);
+		}catch (LibraryOperationException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while returning library item. " + ex.getMessage());
+		}
 	}
 
 	private void printCurrentLoanableInventory() {
 		System.out.println();
-		System.out.println("**************************** CURRENT LOANABLE INVENTORY AFTER FEW LOAN *************************************");
+		System.out.println("---------------------------------- CURRENT LOANABLE INVENTORY AFTER FEW LOAN ----------------------------------------------");
 		System.out.println();
 
 		library.getCurrentLoanableInventory().forEach(System.out::println);
@@ -74,7 +94,7 @@ public class CityLibraryApplication implements CommandLineRunner {
 
 	private void printItemsBorrowedByUsers() {
 		System.out.println();
-		System.out.println("**************************** ITEMS BORROWED BY A CUSTOMER-1 *************************************");
+		System.out.println("---------------------------------- ITEMS BORROWED BY A CUSTOMER-1 ----------------------------------------------");
 		System.out.println();
 
 		Person customer1 = csvDataService.getCustomerById(1);
@@ -82,17 +102,17 @@ public class CityLibraryApplication implements CommandLineRunner {
 
 
 		System.out.println();
-		System.out.println("**************************** ITEMS BORROWED BY A CUSTOMER-2 *************************************");
+		System.out.println("---------------------------------- ITEMS BORROWED BY A CUSTOMER-2 ----------------------------------------------");
 		System.out.println();
 
-		Person customer2 = csvDataService.getCustomerById(1);
+		Person customer2 = csvDataService.getCustomerById(2);
 		library.getItemBorrowedByUser(customer2).forEach(loan-> System.out.println(loan.getItem()));
 	}
 
 	private void borrowItems() {
 
 		System.out.println();
-		System.out.println("**************************** CUSTOMER-1 BORROWS ITEMS *************************************");
+		System.out.println("---------------------------------- CUSTOMER-1 BORROWS ITEMS ----------------------------------------------");
 		System.out.println();
 
 		Person customer1 = csvDataService.getCustomerById(1);
@@ -102,25 +122,52 @@ public class CityLibraryApplication implements CommandLineRunner {
 		System.out.println(item);
 		System.out.println(item3);
 
-		library.borrowItem(customer1,item);
-		library.borrowItem(customer1,item3);
+		try {
+			library.borrowItem(customer1, item);
+		} catch (LibraryItemNotFoundException | LibraryItemNotLoanableException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while borrowing library item " + ex.getMessage());
+		}
+
+		try {
+			library.borrowItem(customer1, item3);
+		} catch (LibraryItemNotFoundException | LibraryItemNotLoanableException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while borrowing library item " + ex.getMessage());
+		}
 
 
 		System.out.println();
-		System.out.println("**************************** CUSTOMER-2 BORROWS A ITEM *************************************");
+		System.out.println("---------------------------------- CUSTOMER-2 BORROWS A ITEM ----------------------------------------------");
 		System.out.println();
 
-		Person customer2 = csvDataService.getCustomerById(1);
+		Person customer2 = csvDataService.getCustomerById(2);
 		LibraryItem item2 = csvDataService.getItemsByLibraryId(3);
 
 		System.out.println(item2);
 
-		library.borrowItem(customer2,item2);
+		try {
+			library.borrowItem(customer2, item2);
+		} catch (LibraryItemNotFoundException | LibraryItemNotLoanableException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while borrowing library item " + ex.getMessage());
+		}
 
+		// trying to borrow already borrowed item
+		try {
+			library.borrowItem(customer2, item2);
+		} catch (LibraryItemNotFoundException | LibraryItemNotLoanableException ex) {
+			logger.info(ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error encountered while borrowing library item " + ex.getMessage());
+		}
 	}
 
 	private void printCurrentInventory() {
-		System.out.println("**************************** CURRENT INVENTORY *************************************");
+		System.out.println("---------------------------------- CURRENT INVENTORY ----------------------------------------------");
 		System.out.println();
 
 		Map<Integer, List<LibraryItem>> mp = library.getCurrentInventory().stream().collect(Collectors.groupingBy((LibraryItem::getItemId)));
@@ -133,7 +180,7 @@ public class CityLibraryApplication implements CommandLineRunner {
 			System.out.println("Currently Loaned:" + value.stream().filter(t -> t.getItemStatus().equals(Status.LOANED)).count());
 			System.out.println("List of Library Items:");
 			value.forEach(System.out::println);
-			System.out.println("************************************************************************************");
+			System.out.println("------------------------------------------------------------------------------------------------------");
 		});
 
 	}
@@ -142,7 +189,7 @@ public class CityLibraryApplication implements CommandLineRunner {
 
 	private void printOverDueItems() {
 		System.out.println();
-		System.out.println("**************************** PRINT OVERDUE ITEMS *************************************");
+		System.out.println("---------------------------------- PRINT OVERDUE ITEMS ----------------------------------------------");
 		System.out.println();
 
 		library.getOverDueItems().forEach(System.out::println);

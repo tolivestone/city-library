@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class LibraryTest {
 
-    private DataService mockDataService;
+ /*   private DataService mockDataService;
     private LendingService mockLendingService;
     private Library library;
     private List<LibraryItem> items;
@@ -211,6 +211,6 @@ public class LibraryTest {
         verify(mockDataService, atMost(ONE))
                 .getCurrentLoanableInventory();
 
-    }
+    }*/
 
 }
