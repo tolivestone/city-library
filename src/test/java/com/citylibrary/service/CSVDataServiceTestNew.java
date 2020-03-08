@@ -4,182 +4,271 @@ import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.db.DataStore;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
+import com.citylibrary.model.actor.Customer;
+import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import com.citylibrary.model.item.Loan;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static com.citylibrary.constant.TestConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class CSVDataServiceTestNew {
 
-
-    @Autowired
+    @Mock
     DataStore dataStore;
 
-    @Autowired
-    CSVDataService CSVDataService;
+    @InjectMocks
+    CSVDataService libraryCsvDataService;
 
-    @BeforeEach
-    public void setUp() {
-        CSVDataService.clearDataStore();
-    }
-
+    private final Object PRESENT = new Object();
 
     @Test
-    public void getCurrentInventory() {
+    public void canGetCurrentInventory() {
 
-        List<LibraryItem> items = getLibraryItemList();
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
 
-        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
+        //When
+        List<LibraryItem> returnedItems = libraryCsvDataService.getCurrentInventory();
 
-        //Checking inventory
-        Assertions.assertThat(CSVDataService.getCurrentInventory())
+        //Then
+        assertThat(returnedItems)
                 .isNotEmpty()
-                .hasSize(5)
+                .hasSize(SIZE_FIVE)
                 .doesNotContainNull()
                 .allMatch(d -> d.getItemStatus() == Status.AVAILABLE);
-
-        //Checking inventory with loaned items
-        items.get(0).setItemStatus(Status.LOANED);
-        items.get(4).setItemStatus(Status.LOANED);
-
-        Assertions.assertThat(CSVDataService.getCurrentInventory())
-                .isNotEmpty()
-                .hasSize(5)
-                .doesNotContainNull()
-                .anyMatch(d -> d.getItemStatus() == Status.LOANED);
     }
-
-    private List<LibraryItem> getLibraryItemList() {
-        return List.of(
-                new LibraryItem.LibraryItemBuilder(1, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(2, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(3, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
-                new LibraryItem.LibraryItemBuilder(4, 2, ItemType.DVD, "Pi").build(),
-                new LibraryItem.LibraryItemBuilder(5, 3, ItemType.DVD, "Frozen").build()
-        );
-    }
-
 
     @Test
-    public void getCurrentLoanableInventory() {
+    public void canGetCurrentLoanableInventory() {
 
-        List<LibraryItem> items = getLibraryItemList();
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        items.get(1).setItemStatus(Status.LOANED);
+        items.get(3).setItemStatus(Status.LOANED);
 
-        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
+        when(dataStore.getLibraryItems()).thenReturn(items);
 
-        //Checking inventory with loaned items
-        items.get(0).setItemStatus(Status.LOANED);
-        items.get(4).setItemStatus(Status.LOANED);
+        //When
+        List<LibraryItem> returnedItems = libraryCsvDataService.getCurrentLoanableInventory();
 
-        Assertions.assertThat(CSVDataService.getCurrentLoanableInventory())
+        //Then
+        assertThat(returnedItems)
                 .isNotEmpty()
-                .hasSize(3)
+                .hasSize(SIZE_THREE)
                 .extracting("itemStatus")
                 .doesNotContain(Status.LOANED)
                 .allMatch(d -> d.equals(Status.AVAILABLE));
     }
 
     @Test
-    public void searchItemsByTitle_withMatchingItems() {
+    public void canSearchItemsByTitle() {
 
-        List<LibraryItem> items = getLibraryItemList();
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
 
-        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
+        //When
+        List<LibraryItem> returnedItems = libraryCsvDataService.getItemsByTitle("Introduction to Algorithms");
 
-        Assertions.assertThat(CSVDataService.getItemsByTitle("Introduction to Algorithms"))
+        //Then
+        assertThat(returnedItems)
                 .isNotEmpty()
-                .hasSize(3)
+                .hasSize(SIZE_THREE)
                 .flatExtracting(LibraryItem::getTitle)
                 .allMatch(d -> d.equals("Introduction to Algorithms"));
     }
 
     @Test
-    public void searchItemsByTitle_withNoMatchingItems() {
+    public void cannotSearchItemsByTitleWhenItemDoesNotExist() {
 
-        List<LibraryItem> items = getLibraryItemList();
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
 
-        items.parallelStream().forEach(item -> CSVDataService.addLibraryItem(item));
+        //When
+        List<LibraryItem> returnedItems = libraryCsvDataService.getItemsByTitle("Fake Title");
 
-        Assertions.assertThat(CSVDataService.getItemsByTitle("Fake title"))
-                .isEmpty();
+        //Then
+        assertThat(returnedItems).isEmpty();
     }
 
     @Test
-    public void addItem_happyPath() {
+    public void canThrowExceptionWithNullParameterToGetItemsByTitle() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> libraryCsvDataService.getItemsByTitle(null))
+                .withMessage("Invalid method parameter(s). Title cannot be null");
+    }
 
+    @Test
+    public void canAddItemToDataStore() {
+
+        //Given
+        LibraryItem vhs =
+                new LibraryItem.LibraryItemBuilder(7, 2, ItemType.VHS, "WarGames").build();
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
+
+        //When
+        libraryCsvDataService.addLibraryItem(vhs);
+
+        //Then
+        assertThat(items.values()).contains(vhs);
+        verify(dataStore, atMost(INVOKED_ONCE)).getLibraryItems();
+    }
+
+    @Test
+    public void canThrowExceptionWithNullParameterToAddLibrary() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> libraryCsvDataService.addLibraryItem(null))
+                .withMessage("Invalid method parameter(s). Item cannot be null");
+    }
+
+    @Test
+    public void canRemoveItemFromDataStore() throws LibraryOperationException {
+
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
+        LibraryItem frozenDvd = items.get(5);
+
+        //When
+        boolean isRemoved = libraryCsvDataService.removeLibraryItem(frozenDvd);
+
+        //Then
+        assertThat(isRemoved).isEqualTo(true);
+        assertThat(items.values()).doesNotContain(frozenDvd);
+        assertThat(libraryCsvDataService.getItemsByLibraryId(5)).isNull();
+    }
+
+    @Test
+    public void canThrowExceptionWithNullParameterToRemoveLibraryItem() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> libraryCsvDataService.removeLibraryItem(null))
+                .withMessage("Invalid method parameter(s). Item cannot be null");
+    }
+
+    @Test
+    public void cannotRemoveNonExistingLibraryItem() {
+
+        //Given
+        ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();
+        when(dataStore.getLibraryItems()).thenReturn(items);
+        LibraryItem nonExistingVhs =
+                new LibraryItem.LibraryItemBuilder(100, 200, ItemType.VHS, "Fake Item").build();
+
+        //When
+        boolean isRemoved = libraryCsvDataService.removeLibraryItem(nonExistingVhs);
+
+        //Then
+        assertThat(isRemoved).isFalse();
+        assertThat(items).hasSize(SIZE_FIVE);
+        verify(dataStore, atMost(INVOKED_ONCE)).getLibraryItems();
+    }
+
+
+    @Test
+    public void canGetLoanList() {
+        //Given
+        ConcurrentMap<Loan, Object> loans = getLoanMap();
+        when(dataStore.getLoans()).thenReturn(loans);
+
+        //When
+        List<Loan> loanList = libraryCsvDataService.getLoan();
+
+        //Then
+        assertThat(loanList).isNotEmpty()
+                .hasSize(SIZE_THREE);
+        verify(dataStore,atMost(INVOKED_ONCE)).getLoans();
+    }
+
+    @Test
+    public void canAddLoan() {
+        //Given
+        ConcurrentMap<Loan, Object> loans = getLoanMap();
+        when(dataStore.getLoans()).thenReturn(loans);
 
         LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
+                new LibraryItem.LibraryItemBuilder(7, 2, ItemType.VHS, "WarGames").build();
+        Person customer = new Customer(4,"Customer 4","Customer Last Name");
 
-        CSVDataService.addLibraryItem(vhs);
+        //When
+        libraryCsvDataService.addLoan(customer,vhs,LocalDate.now(),LocalDate.now().plusDays(7));
 
-        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
-                .isNotNull()
-                .isEqualTo(vhs);
+        //Then
+        assertThat(loans).isNotEmpty()
+                .hasSize(SIZE_FOUR);
+        verify(dataStore,atMost(INVOKED_ONCE)).getLoans();
     }
 
     @Test
-    public void add_withNullParameter() {
-
-        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
-                .isNull();
-
-        Assertions.assertThatNullPointerException()
-                .isThrownBy(() -> CSVDataService.addLibraryItem(null))
-                .withMessage("Item cannot be null");
-    }
-
-    @Test
-    public void removeItem_happyPath() throws LibraryOperationException {
+    public void canReturnLoanItem() {
+        //Given
+        ConcurrentMap<Loan, Object> loans = getLoanMap();
+        when(dataStore.getLoans()).thenReturn(loans);
 
         LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
+                new LibraryItem.LibraryItemBuilder(7, 2, ItemType.VHS, "WarGames").build();
+        Person customer = new Customer(4,"Customer 4","Customer Last Name");
+        Loan newLoan = new Loan(customer,vhs,LocalDate.now(),LocalDate.now().plusDays(SEVEN_DAYS));
 
-        CSVDataService.addLibraryItem(vhs);
+        loans.put(newLoan,PRESENT);
 
-        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
-                .isNotNull()
-                .isEqualTo(vhs);
+        //When
+        boolean isReturnSuccess = libraryCsvDataService.returnLoanedItem(vhs);
 
-
-        boolean isRemoved = CSVDataService.removeLibraryItem(vhs);
-
-        Assertions.assertThat(isRemoved)
-                .isEqualTo(true);
-
-        Assertions.assertThat(CSVDataService.getItemsByLibraryId(1))
-                .isNull();
+        //Then
+        assertThat(isReturnSuccess).isTrue();
+        assertThat(loans).isNotEmpty()
+                .hasSize(SIZE_THREE)
+                .doesNotContainKeys(newLoan);
+        verify(dataStore,atMost(INVOKED_TWICE)).getLoans();
     }
-
-    @Test
-    public void remove_withNullParameter() {
-
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> CSVDataService.removeLibraryItem(null))
-                .withMessage("Item cannot be null");
-    }
-
-    @Test
-    public void remove_nonExistingLibraryItem() {
-
-        Assertions.assertThat(CSVDataService.getCurrentInventory())
-                .isEmpty();
-
-        LibraryItem vhs =
-                new LibraryItem.LibraryItemBuilder(1, 2, ItemType.VHS, "WarGames").build();
-
-        Assertions.assertThatExceptionOfType(LibraryOperationException.class)
-                .isThrownBy(() -> CSVDataService.removeLibraryItem(vhs))
-                .withMessage("Item does not exist");
-    }
-
 
     @Test
     public void isBorrowed() {
+    }
+
+    private ConcurrentMap<Integer, LibraryItem> getLibraryItemMap() {
+
+        ConcurrentMap<Integer, LibraryItem> libItems = new ConcurrentHashMap<>();
+        libItems.putAll(
+                Map.of(
+                        1, new LibraryItem.LibraryItemBuilder(1, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                        2, new LibraryItem.LibraryItemBuilder(2, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                        3, new LibraryItem.LibraryItemBuilder(3, 1, ItemType.BOOK, "Introduction to Algorithms").build(),
+                        4, new LibraryItem.LibraryItemBuilder(4, 2, ItemType.DVD, "Pi").build(),
+                        5, new LibraryItem.LibraryItemBuilder(5, 3, ItemType.DVD, "Frozen").build()
+                ));
+        return libItems;
+    }
+
+    private ConcurrentMap<Loan, Object> getLoanMap() {
+
+        final ConcurrentMap<Loan, Object> loanItems = new ConcurrentHashMap<>();
+        final Person customer1 = new Customer(1, "Customer 1", "Custmer 1 Last Name");
+        final Person customer2 = new Customer(2, "Customer 2", "Custmer 2 Last Name");
+
+        loanItems.putAll(
+                Map.of(
+                        new Loan(customer1, getLibraryItemMap().get(1), LocalDate.now(), LocalDate.now().plusDays(SEVEN_DAYS)), PRESENT,
+                        new Loan(customer1, getLibraryItemMap().get(2), LocalDate.now(), LocalDate.now().plusDays(SEVEN_DAYS)), PRESENT,
+                        new Loan(customer2, getLibraryItemMap().get(3), LocalDate.now(), LocalDate.now().plusDays(SEVEN_DAYS)), PRESENT
+                ));
+        return loanItems;
     }
 }

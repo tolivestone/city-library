@@ -205,7 +205,7 @@ public class LibraryIntegrationTest {
     }
 
     @Test
-    public void isBookAvailable() {
+    public void canCheckBookAvailable() {
         //Given
         LibraryItem book = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 

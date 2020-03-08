@@ -1,16 +1,35 @@
 package com.citylibrary.service;
 
+import com.citylibrary.config.LibraryConfig;
+import com.citylibrary.csvhelper.CsvDataLoader;
+import com.citylibrary.db.CSVLibraryDataStore;
+import com.citylibrary.db.DataStore;
+import com.citylibrary.enums.ItemType;
+import com.citylibrary.enums.Status;
+import com.citylibrary.model.item.LibraryItem;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 //TODO:Mock dependency
 public class CSVDataServiceTest {
 
-/*
+
     DataStore dataStore;
     CSVDataService CSVDataService;
+    CsvDataLoader csvloader;
+    LibraryConfig libraryConfig;
 
     @BeforeEach
     public void setUp() {
-        dataStore = CSVLibraryDataStore.getInstance();
-        CSVDataService = new CSVDataService(dataStore);
+        libraryConfig = new LibraryConfig();
+        libraryConfig.setLibraryItemFileName("data/library.csv");
+        libraryConfig.setCustomerFileName("data/customers.csv");
+        dataStore = new CSVLibraryDataStore();
+        csvloader = new CsvDataLoader(libraryConfig);
+        CSVDataService = new CSVDataService(dataStore,csvloader);
         CSVDataService.clearDataStore();
 
     }
@@ -40,7 +59,7 @@ public class CSVDataServiceTest {
                 .doesNotContainNull()
                 .anyMatch(d->d.getItemStatus() == Status.LOANED);
     }
-
+/*
     @Test
     public void getCurrentLoanableInventory() {
 
@@ -163,7 +182,7 @@ public class CSVDataServiceTest {
                 .isThrownBy(()-> CSVDataService.removeLibraryItem(vhs))
                 .withMessage("Item does not exist");
     }
-
+*/
 
      private List<LibraryItem> getLibraryItemList() {
          return List.of(
@@ -177,5 +196,5 @@ public class CSVDataServiceTest {
 
     @Test
     public void isBorrowed() {
-    }*/
+    }
 }

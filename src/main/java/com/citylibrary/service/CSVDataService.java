@@ -6,7 +6,6 @@ import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,13 +20,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CSVDataService implements DataService {
 
-    @Autowired
+    //@Autowired
     private DataStore dataStore;
 
-    @Autowired
+    //@Autowired
     private CsvDataLoader csvDataLoader;
 
     private static final Object PRESENT = new Object();
+
+    @Autowired
+    public CSVDataService(DataStore dataStore, CsvDataLoader csvDataLoader) {
+        this.dataStore = dataStore;
+        this.csvDataLoader = csvDataLoader;
+    }
 
     @PostConstruct
     public void initilize() {
@@ -71,6 +76,9 @@ public class CSVDataService implements DataService {
 
     @Override
     public List<LibraryItem> getItemsByTitle(final String title) {
+        if(title == null)
+            throw new IllegalArgumentException("Invalid method parameter(s). Title cannot be null");
+
         Predicates byTitle = new Predicates(title);
         return getLibraryItems(byTitle);
     }
@@ -82,13 +90,16 @@ public class CSVDataService implements DataService {
 
     @Override
     public void addLibraryItem(final LibraryItem item) {
-        dataStore.getLibraryItems().putIfAbsent(item.getLibraryId(), item);
+        if(item == null)
+            throw new IllegalArgumentException("Invalid method parameter(s). Item cannot be null");
+
+        LibraryItem retItem = dataStore.getLibraryItems().putIfAbsent(item.getLibraryId(), item);
     }
 
     @Override
     public boolean removeLibraryItem(final LibraryItem item) {
         if(item == null)
-            throw new IllegalArgumentException("Item cannot be null");
+            throw new IllegalArgumentException("Invalid method parameter(s). Item cannot be null");
 
         return dataStore.getLibraryItems().remove(item.getLibraryId(), item);
     }
@@ -100,6 +111,9 @@ public class CSVDataService implements DataService {
 
     @Override
     public void addLoan(Person customer, LibraryItem item, LocalDate issueDate, LocalDate dueDate) {
+        if(customer == null || item == null || issueDate == null || dueDate == null)
+            throw new IllegalArgumentException("Invalid method parameter(s). Item cannot be null");
+
         synchronized (item) {
             item.setItemStatus(Status.LOANED);
             Loan newLoan = new Loan(customer, item, issueDate, dueDate);
@@ -125,7 +139,8 @@ public class CSVDataService implements DataService {
         if (loanedItem != null) {
             synchronized (item) {
                 item.setItemStatus(Status.AVAILABLE);
-                success = dataStore.getLoans().remove(loanedItem, PRESENT);
+                    dataStore.getLoans().remove(loanedItem);
+                    success = true;
             }
         }
         return success;

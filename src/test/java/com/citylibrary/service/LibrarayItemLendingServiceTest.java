@@ -82,7 +82,7 @@ public class LibrarayItemLendingServiceTest {
     }*/
 
     @Test
-    public void borrowItem_withNullParameters() {
+    public void cannotBorrowItemWithNullParameters() {
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
 
@@ -97,7 +97,7 @@ public class LibrarayItemLendingServiceTest {
     }
 
     @Test
-    public void returnItem_happyPath() throws LibraryOperationException {
+    public void canReturnItemBorrowedItem() throws LibraryOperationException {
 
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
@@ -117,7 +117,7 @@ public class LibrarayItemLendingServiceTest {
     }
 
     @Test
-    public void returnItem_withNonBorrowedItem() throws LibraryOperationException {
+    public void cannotReturnNonBorrowedItem() throws LibraryOperationException {
 
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
@@ -135,7 +135,7 @@ public class LibrarayItemLendingServiceTest {
     }
 
     @Test
-    public void returnItem_withNullParameters() {
+    public void cannotReturnItemWithNullParameters() {
 
        // CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);

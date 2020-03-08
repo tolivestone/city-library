@@ -23,10 +23,14 @@ import java.util.List;
 import static com.citylibrary.constant.Constant.*;
 
 @Component
-@AllArgsConstructor         // This will give an opportunity to inject dependencies without spring in unit tests
 public class CsvDataLoader {
 
-    @Autowired private LibraryConfig libraryConfig;
+    private LibraryConfig libraryConfig;
+
+    @Autowired
+    public CsvDataLoader(LibraryConfig libraryConfig) {
+        this.libraryConfig = libraryConfig;
+    }
 
     private static final Logger logger
             = LoggerFactory.getLogger(CityLibraryApplication.class);
