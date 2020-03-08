@@ -10,7 +10,6 @@ import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
 import com.citylibrary.service.DataService;
-import com.citylibrary.service.LendingService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,6 @@ public class LibraryIntegrationTest {
     DataService dataService;
 
     @Autowired
-    LendingService lendingService;
-
-    @Autowired
     Library library;
 
     Person customer;
@@ -43,7 +39,7 @@ public class LibraryIntegrationTest {
         customer = dataService.getCustomerById(1);
     }
 
-   @Test
+    @Test
     public void getCurrentInventory() {
 
         //Given
@@ -78,7 +74,7 @@ public class LibraryIntegrationTest {
         LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //When
-        boolean ret = library.borrowItem(customer,borrowBook);
+        boolean ret = library.borrowItem(customer, borrowBook);
 
         //Then
         assertThat(ret).isTrue();
@@ -93,7 +89,7 @@ public class LibraryIntegrationTest {
         LibraryItem borrowDvd = library.getItemByTitleAndType("Pi", ItemType.DVD);
 
         //When
-        boolean ret = library.borrowItem(customer,borrowDvd);
+        boolean ret = library.borrowItem(customer, borrowDvd);
 
         //Then
         assertThat(ret).isTrue();
@@ -108,7 +104,7 @@ public class LibraryIntegrationTest {
         LibraryItem borrowVhs = library.getItemByTitleAndType("Hackers", ItemType.VHS);
 
         //When
-        boolean ret = library.borrowItem(customer,borrowVhs);
+        boolean ret = library.borrowItem(customer, borrowVhs);
 
         //Then
         assertThat(ret).isTrue();
@@ -123,30 +119,30 @@ public class LibraryIntegrationTest {
         LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //When
-        boolean ret = library.borrowItem(customer,borrowBook);
+        boolean ret = library.borrowItem(customer, borrowBook);
 
         //Then
         Assertions.assertThatExceptionOfType(LibraryItemNotLoanableException.class)
-                .isThrownBy(()-> library.borrowItem(customer,borrowBook));
+                .isThrownBy(() -> library.borrowItem(customer, borrowBook));
     }
 
-     @Test
+    @Test
     public void canReturnBorrowedItem() throws LibraryOperationException {
 
         //Given
-         LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
-         library.borrowItem(customer,borrowBook);
+        LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        library.borrowItem(customer, borrowBook);
 
-         //When
-         boolean ret = library.returnItem(borrowBook);
+        //When
+        boolean ret = library.returnItem(borrowBook);
 
-         //Then
-         assertThat(ret)
-                 .isTrue();
+        //Then
+        assertThat(ret)
+                .isTrue();
 
-         assertThat(borrowBook)
-                 .extracting(LibraryItem::getItemStatus)
-                 .as(Status.AVAILABLE.toString());
+        assertThat(borrowBook)
+                .extracting(LibraryItem::getItemStatus)
+                .as(Status.AVAILABLE.toString());
     }
 
     @Test
@@ -157,8 +153,9 @@ public class LibraryIntegrationTest {
 
         //Then
         Assertions.assertThatExceptionOfType(LibraryOperationException.class)
-                .isThrownBy(()-> library.returnItem(borrowBook));
+                .isThrownBy(() -> library.returnItem(borrowBook));
 
+        //When
         assertThat(borrowBook)
                 .extracting(LibraryItem::getItemStatus)
                 .as(Status.AVAILABLE.toString());
@@ -166,18 +163,17 @@ public class LibraryIntegrationTest {
 
     @Test
     public void canGetOverDueItems() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
+        //Given
         LibraryItem borrowBook1 = library.getItemByLibraryId(1);
         LibraryItem borrowBook2 = library.getItemByLibraryId(2);
 
-        library.borrowItem(customer,borrowBook1);
-        library.borrowItem(customer,borrowBook2);
+        //When
+        library.borrowItem(customer, borrowBook1);
+        library.borrowItem(customer, borrowBook2);
 
-        // Make any one item overdue
-        //dataService.getLoan().stream().findAny().ifPresent(item->item.setDueDate(LocalDate.now().plusDays(-3)));
-
+        //Then
         assertThat(library.getOverDueItems())
                 .isEmpty();
-
     }
 
     @Test
@@ -189,9 +185,9 @@ public class LibraryIntegrationTest {
         LibraryItem borrowJavaBook = library.getItemByTitleAndType("Java Concurrency In Practice", ItemType.BOOK);
         LibraryItem borrowHackersVhs = library.getItemByTitleAndType("Hackers", ItemType.VHS);
 
-        library.borrowItem(customer,borrowSoftwareBook);
-        library.borrowItem(customer,borrowJavaBook);
-        library.borrowItem(customer,borrowHackersVhs);
+        library.borrowItem(customer, borrowSoftwareBook);
+        library.borrowItem(customer, borrowJavaBook);
+        library.borrowItem(customer, borrowHackersVhs);
 
         //When
         List<Loan> loans = library.getItemBorrowedByUser(customer);
@@ -201,7 +197,7 @@ public class LibraryIntegrationTest {
                 .isNotEmpty()
                 .hasSize(3)
                 .flatExtracting(Loan::getCustomer)
-                .allMatch(b->b.equals(customer));
+                .allMatch(b -> b.equals(customer));
     }
 
     @Test

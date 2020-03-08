@@ -1,30 +1,24 @@
 package com.citylibrary.service;
 
-import com.citylibrary.businessexception.LibraryItemNotFoundException;
-import com.citylibrary.businessexception.LibraryItemNotLoanableException;
 import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Customer;
-import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class LibrarayItemLendingServiceTest {
+public class LibraryItemLendingServiceTest {
 
     @Mock
     DataService csvDataService;
@@ -89,7 +83,7 @@ public class LibrarayItemLendingServiceTest {
         Assertions
                 .assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(
-                        ()-> librarayItemLendingService
+                        () -> librarayItemLendingService
                                 .borrowItem(null, null, null, null));
 
         verify(csvDataService, atMost(1))
@@ -102,10 +96,10 @@ public class LibrarayItemLendingServiceTest {
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
 
-        LibraryItem book =  new LibraryItem.LibraryItemBuilder(1,1,ItemType.BOOK,"Test Book").build();
-        Customer c= new Customer(1,"Test","Test");
+        LibraryItem book = new LibraryItem.LibraryItemBuilder(1, 1, ItemType.BOOK, "Test Book").build();
+        Customer c = new Customer(1, "Test", "Test");
         book.setItemStatus(Status.LOANED);
-        List<Loan> l = List.of(new Loan(c,book,LocalDate.now(), LocalDate.now().plusDays(7)));
+        List<Loan> l = List.of(new Loan(c, book, LocalDate.now(), LocalDate.now().plusDays(7)));
 
         when(csvDataService.getLoan()).thenReturn(l);
         when(csvDataService.returnLoanedItem(book)).thenReturn(true);
@@ -122,13 +116,13 @@ public class LibrarayItemLendingServiceTest {
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
 
-        LibraryItem book =  new LibraryItem.LibraryItemBuilder(1,1,ItemType.BOOK,"Test Book").build();
+        LibraryItem book = new LibraryItem.LibraryItemBuilder(1, 1, ItemType.BOOK, "Test Book").build();
 
         when(csvDataService.returnLoanedItem(book)).thenReturn(false);
 
         Assertions.assertThatExceptionOfType(LibraryOperationException.class)
-                .isThrownBy(()-> librarayItemLendingService.returnItem(book))
-                 .withMessage("Cannot return Item 1 Test Book. It has not been loaned");
+                .isThrownBy(() -> librarayItemLendingService.returnItem(book))
+                .withMessage("Cannot return Item 1 Test Book. It has not been loaned");
 
 
         verify(csvDataService, never()).returnLoanedItem(book);
@@ -137,11 +131,11 @@ public class LibrarayItemLendingServiceTest {
     @Test
     public void cannotReturnItemWithNullParameters() {
 
-       // CSVDataService mockCSVDataService = mock(CSVDataService.class);
+        // CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()-> librarayItemLendingService.returnItem(null));
+                .isThrownBy(() -> librarayItemLendingService.returnItem(null));
 
         verify(csvDataService, never()).returnLoanedItem(null);
     }
