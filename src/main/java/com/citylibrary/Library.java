@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.citylibrary.constant.Constant.LOAN_PERIOD;
@@ -102,18 +103,25 @@ public final class Library {
                 .anyMatch(item -> item.equals(libraryItem) && item.getType() == ItemType.BOOK);
     }
 
-    public LibraryItem getItemByTitleAndType(final String title, final ItemType itemType) {
+    public LibraryItem getItemByTitleAndType(final String title, final ItemType itemType) throws LibraryItemNotFoundException {
         if (title == null || itemType == null) {
             String msg = "One or  more invalid method parameter(s) passed to getItemByTitleAndType. title and itemType cannot be null";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
 
-        return
-                dataService.getCurrentInventory()
-                        .parallelStream()
-                        .filter(item -> item.getTitle().contains(title) && item.getType().equals(itemType))
-                        .findFirst().get();
+        Optional<LibraryItem> foundItem = dataService.getCurrentInventory()
+                .parallelStream()
+                .filter(item -> item.getTitle().contains(title) && item.getType().equals(itemType))
+                .findFirst();
+
+        if (!foundItem.isPresent()) {
+            String msg = "Requested item " + title + " of type" + itemType + "not found";
+            logger.info(msg);
+            throw new LibraryItemNotFoundException(msg);
+        }
+
+        return foundItem.get();
     }
 
     public LibraryItem getItemByLibraryId(final int libraryId) {

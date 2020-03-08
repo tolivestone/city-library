@@ -24,7 +24,7 @@ import static com.citylibrary.constant.Constant.*;
 @Component
 public class CSVDataLoader {
 
-    private LibraryConfig libraryConfig;
+    private final LibraryConfig libraryConfig;
 
     // constructor injection gives an opportunity to mock and run unit tests outside spring framework
     @Autowired

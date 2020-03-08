@@ -111,7 +111,7 @@ public class LibraryItemLendingServiceTest {
     }
 
     @Test
-    public void cannotReturnNonBorrowedItem() throws LibraryOperationException {
+    public void cannotReturnNonBorrowedItem() {
 
         //CSVDataService mockCSVDataService = mock(CSVDataService.class);
         //LibrarayItemLendingService librarayItemLendingService = new LibrarayItemLendingService(mockCSVDataService);

@@ -1,6 +1,5 @@
 package com.citylibrary.service;
 
-import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
@@ -15,7 +14,7 @@ public interface DataService {
 
     void addLibraryItem(final LibraryItem item);
 
-    boolean removeLibraryItem(final LibraryItem item) throws LibraryOperationException;
+    boolean removeLibraryItem(final LibraryItem item);
 
     void addLoan(Person customer, LibraryItem item, LocalDate issueDate, LocalDate dueDate);
 

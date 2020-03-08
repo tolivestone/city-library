@@ -4,6 +4,7 @@ import com.citylibrary.Library;
 import com.citylibrary.businessexception.LibraryItemNotFoundException;
 import com.citylibrary.businessexception.LibraryItemNotLoanableException;
 import com.citylibrary.businessexception.LibraryOperationException;
+import com.citylibrary.constant.TestConstants;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Person;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static com.citylibrary.constant.TestConstants.SIZE_THREE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 // These are E2E integration tests, Not using mock but real dependencies
@@ -51,7 +53,7 @@ public class LibraryIntegrationTest {
         //Then
         assertThat(inventory)
                 .isNotEmpty()
-                .hasSize(12);
+                .hasSize(TestConstants.SIZE_TWELVE);
     }
 
     @Test
@@ -80,7 +82,7 @@ public class LibraryIntegrationTest {
         assertThat(ret).isTrue();
         assertThat(borrowBook)
                 .extracting(LibraryItem::getItemStatus)
-                .as(Status.LOANED.toString());
+                .isEqualTo(Status.LOANED);
     }
 
     @Test
@@ -95,7 +97,7 @@ public class LibraryIntegrationTest {
         assertThat(ret).isTrue();
         assertThat(borrowDvd)
                 .extracting(LibraryItem::getItemStatus)
-                .as(Status.LOANED.toString());
+                .isEqualTo(Status.LOANED);
     }
 
     @Test
@@ -110,7 +112,7 @@ public class LibraryIntegrationTest {
         assertThat(ret).isTrue();
         assertThat(borrowVhs)
                 .extracting(LibraryItem::getItemStatus)
-                .as(Status.LOANED.toString());
+                .isEqualTo(Status.LOANED);
     }
 
     @Test
@@ -142,11 +144,11 @@ public class LibraryIntegrationTest {
 
         assertThat(borrowBook)
                 .extracting(LibraryItem::getItemStatus)
-                .as(Status.AVAILABLE.toString());
+                .isEqualTo(Status.AVAILABLE);
     }
 
     @Test
-    public void canNotReturnUnBorrowedItem() throws LibraryOperationException {
+    public void canNotReturnUnBorrowedItem() throws LibraryItemNotFoundException {
 
         //Given
         LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
@@ -158,7 +160,7 @@ public class LibraryIntegrationTest {
         //When
         assertThat(borrowBook)
                 .extracting(LibraryItem::getItemStatus)
-                .as(Status.AVAILABLE.toString());
+                .isEqualTo(Status.AVAILABLE);
     }
 
     @Test
@@ -195,13 +197,13 @@ public class LibraryIntegrationTest {
         //Then
         assertThat(loans)
                 .isNotEmpty()
-                .hasSize(3)
+                .hasSize(SIZE_THREE)
                 .flatExtracting(Loan::getCustomer)
-                .allMatch(b -> b.equals(customer));
+                .allMatch(c -> c.equals(customer));
     }
 
     @Test
-    public void canCheckBookAvailable() {
+    public void canCheckBookAvailable() throws LibraryItemNotFoundException {
         //Given
         LibraryItem book = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 

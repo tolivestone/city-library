@@ -1,6 +1,5 @@
 package com.citylibrary.service;
 
-import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.db.DataStore;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
@@ -70,7 +69,7 @@ public class CSVDataServiceTest {
         assertThat(returnedItems)
                 .isNotEmpty()
                 .hasSize(SIZE_THREE)
-                .extracting("itemStatus")
+                .extracting(LibraryItem::getItemStatus)
                 .doesNotContain(Status.LOANED)
                 .allMatch(d -> d.equals(Status.AVAILABLE));
     }
@@ -139,7 +138,7 @@ public class CSVDataServiceTest {
     }
 
     @Test
-    public void canRemoveItemFromDataStore() throws LibraryOperationException {
+    public void canRemoveItemFromDataStore() {
 
         //Given
         ConcurrentMap<Integer, LibraryItem> items = getLibraryItemMap();

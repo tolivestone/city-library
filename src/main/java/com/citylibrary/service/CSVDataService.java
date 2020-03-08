@@ -13,15 +13,14 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CSVDataService implements DataService {
 
-    private DataStore dataStore;
-    private CSVDataLoader csvDataLoader;
+    private final DataStore dataStore;
+    private final CSVDataLoader csvDataLoader;
 
     private static final Object PRESENT = new Object();
     private static final Logger logger = LoggerFactory.getLogger(CSVDataService.class);
@@ -96,7 +95,7 @@ public class CSVDataService implements DataService {
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        LibraryItem retItem = dataStore.getLibraryItems().putIfAbsent(item.getLibraryId(), item);
+        dataStore.getLibraryItems().putIfAbsent(item.getLibraryId(), item);
     }
 
     @Override
@@ -133,7 +132,7 @@ public class CSVDataService implements DataService {
     @Override
     public List<Loan> getLoan() {
 
-        List<Loan> loanList = new ArrayList<>();
+        List<Loan> loanList;
         loanList = dataStore.getLoans().keySet().parallelStream().collect(Collectors.toList());
 
         return loanList;

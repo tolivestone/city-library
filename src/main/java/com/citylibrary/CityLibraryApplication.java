@@ -3,7 +3,6 @@ package com.citylibrary;
 import com.citylibrary.businessexception.LibraryItemNotFoundException;
 import com.citylibrary.businessexception.LibraryItemNotLoanableException;
 import com.citylibrary.businessexception.LibraryItemNotLoanedReturnedException;
-import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.enums.Status;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
@@ -37,7 +36,7 @@ public class CityLibraryApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         //Print current inventory including loaned items
         this.printCurrentInventory();
@@ -66,25 +65,24 @@ public class CityLibraryApplication implements CommandLineRunner {
 
 
         LibraryItem book = library.getItemByLibraryId(1);
-        ;
         System.out.println(book);
         try {
             library.returnItem(book);
         } catch (LibraryItemNotLoanedReturnedException ex) {
-			System.out.println("Cannot return item. This item has either already been returned or not borrowed");
-		} catch (Exception ex) {
-			logger.error("Error encountered while returning library item. " + ex.getMessage());
-		}
+            System.out.println("Cannot return item. This item has either already been returned or not borrowed");
+        } catch (Exception ex) {
+            logger.error("Error encountered while returning library item. " + ex.getMessage());
+        }
 
         // Returning already returned item
-		System.out.println();
-		System.out.println("----------------------- CUSTOMER-1 TRIES TO RETURN ALREADY RETURNED ITEM OR NOT BORROWED ITEM------------------");
-		System.out.println();
+        System.out.println();
+        System.out.println("----------------------- CUSTOMER-1 TRIES TO RETURN ALREADY RETURNED ITEM OR NOT BORROWED ITEM------------------");
+        System.out.println();
 
         try {
             library.returnItem(book);
         } catch (LibraryItemNotLoanedReturnedException ex) {
-			System.out.println("Cannot return item. This item has either already been returned or not borrowed");
+            System.out.println("Cannot return item. This item has either already been returned or not borrowed");
         } catch (Exception ex) {
             logger.error("Error encountered while returning library item. " + ex.getMessage());
         }
@@ -131,22 +129,22 @@ public class CityLibraryApplication implements CommandLineRunner {
         try {
             library.borrowItem(customer1, item);
         } catch (LibraryItemNotFoundException ex) {
-        		System.out.println("Cannot borrow "+ item.getTitle() + ". It is not available in our inventory");
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not available in our inventory");
         } catch (LibraryItemNotLoanableException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not loanable right now");
-		} catch (Exception ex) {
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not loanable right now");
+        } catch (Exception ex) {
             logger.error("Error encountered while borrowing library item " + ex.getMessage());
         }
 
         try {
             library.borrowItem(customer1, item3);
         } catch (LibraryItemNotFoundException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not available in our inventory");
-		} catch (LibraryItemNotLoanableException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not loanable right now");
-		} catch (Exception ex) {
-			logger.error("Error encountered while borrowing library item " + ex.getMessage());
-		}
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not available in our inventory");
+        } catch (LibraryItemNotLoanableException ex) {
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not loanable right now");
+        } catch (Exception ex) {
+            logger.error("Error encountered while borrowing library item " + ex.getMessage());
+        }
 
 
         System.out.println();
@@ -161,28 +159,28 @@ public class CityLibraryApplication implements CommandLineRunner {
         try {
             library.borrowItem(customer2, item2);
         } catch (LibraryItemNotFoundException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not available in our inventory");
-		} catch (LibraryItemNotLoanableException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not loanable right now");
-		} catch (Exception ex) {
-			logger.error("Error encountered while borrowing library item " + ex.getMessage());
-		}
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not available in our inventory");
+        } catch (LibraryItemNotLoanableException ex) {
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not loanable right now");
+        } catch (Exception ex) {
+            logger.error("Error encountered while borrowing library item " + ex.getMessage());
+        }
 
         // trying to borrow already borrowed item
 
-		System.out.println();
-		System.out.println("---------------------------------- CUSTOMER-2 TRIES TO BORROW ALREADY BORROWED ITEM ----------------------------------------------");
-		System.out.println();
+        System.out.println();
+        System.out.println("---------------------------------- CUSTOMER-2 TRIES TO BORROW ALREADY BORROWED ITEM ----------------------------------------------");
+        System.out.println();
 
         try {
             library.borrowItem(customer2, item2);
         } catch (LibraryItemNotFoundException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not available in our inventory");
-		} catch (LibraryItemNotLoanableException ex) {
-			System.out.println("Cannot borrow "+ item.getTitle() + ". It is not loanable right now");
-		} catch (Exception ex) {
-			logger.error("Error encountered while borrowing library item " + ex.getMessage());
-		}
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not available in our inventory");
+        } catch (LibraryItemNotLoanableException ex) {
+            System.out.println("Cannot borrow " + item.getTitle() + ". It is not loanable right now");
+        } catch (Exception ex) {
+            logger.error("Error encountered while borrowing library item " + ex.getMessage());
+        }
     }
 
     private void printCurrentInventory() {

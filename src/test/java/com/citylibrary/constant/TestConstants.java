@@ -8,4 +8,5 @@ public class TestConstants {
     public static final int SEVEN_DAYS = 7;
     public static final int INVOKED_TWICE = 2;
     public static final int SIZE_TWO = 2;
+    public static final int SIZE_TWELVE = 12;
 }
