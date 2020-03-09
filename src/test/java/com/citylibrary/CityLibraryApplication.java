@@ -1,5 +1,6 @@
 package com.citylibrary;
 
+import com.citylibrary.manager.LibraryManager;
 import com.citylibrary.service.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CityLibraryApplication {
 
     @Autowired
-    private Library library;
+    private LibraryManager libraryManager;
     @Autowired
     DataService csvDataService;
 

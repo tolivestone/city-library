@@ -1,12 +1,12 @@
 package com.citylibrary.integration;
 
-import com.citylibrary.Library;
 import com.citylibrary.businessexception.LibraryItemNotFoundException;
 import com.citylibrary.businessexception.LibraryItemNotLoanableException;
 import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.constant.TestConstants;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
+import com.citylibrary.manager.LibraryManager;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
 import com.citylibrary.model.item.Loan;
@@ -31,7 +31,7 @@ public class LibraryIntegrationTest {
     DataService dataService;
 
     @Autowired
-    Library library;
+    LibraryManager libraryManager;
 
     Person customer;
 
@@ -48,7 +48,7 @@ public class LibraryIntegrationTest {
         dataService.reloadDataStore();
 
         //When
-        List<LibraryItem> inventory = library.getCurrentInventory();
+        List<LibraryItem> inventory = libraryManager.getCurrentInventory();
 
         //Then
         assertThat(inventory)
@@ -63,7 +63,7 @@ public class LibraryIntegrationTest {
         dataService.clearDataStore();
 
         //When
-        List<LibraryItem> inventory = library.getCurrentInventory();
+        List<LibraryItem> inventory = libraryManager.getCurrentInventory();
 
         //Then
         assertThat(inventory)
@@ -73,10 +73,10 @@ public class LibraryIntegrationTest {
     @Test
     public void canBorrowBook() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
         //Given
-        LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        LibraryItem borrowBook = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //When
-        boolean ret = library.borrowItem(customer, borrowBook);
+        boolean ret = libraryManager.borrowItem(customer, borrowBook);
 
         //Then
         assertThat(ret).isTrue();
@@ -88,10 +88,10 @@ public class LibraryIntegrationTest {
     @Test
     public void canBorrowDvd() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
         //Given
-        LibraryItem borrowDvd = library.getItemByTitleAndType("Pi", ItemType.DVD);
+        LibraryItem borrowDvd = libraryManager.getItemByTitleAndType("Pi", ItemType.DVD);
 
         //When
-        boolean ret = library.borrowItem(customer, borrowDvd);
+        boolean ret = libraryManager.borrowItem(customer, borrowDvd);
 
         //Then
         assertThat(ret).isTrue();
@@ -103,10 +103,10 @@ public class LibraryIntegrationTest {
     @Test
     public void canBorrowVhs() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
         //Given
-        LibraryItem borrowVhs = library.getItemByTitleAndType("Hackers", ItemType.VHS);
+        LibraryItem borrowVhs = libraryManager.getItemByTitleAndType("Hackers", ItemType.VHS);
 
         //When
-        boolean ret = library.borrowItem(customer, borrowVhs);
+        boolean ret = libraryManager.borrowItem(customer, borrowVhs);
 
         //Then
         assertThat(ret).isTrue();
@@ -118,25 +118,25 @@ public class LibraryIntegrationTest {
     @Test
     public void canNotBorrowAlreadyBorrowedBook() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
         //Given
-        LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        LibraryItem borrowBook = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //When
-        boolean ret = library.borrowItem(customer, borrowBook);
+        boolean ret = libraryManager.borrowItem(customer, borrowBook);
 
         //Then
         Assertions.assertThatExceptionOfType(LibraryItemNotLoanableException.class)
-                .isThrownBy(() -> library.borrowItem(customer, borrowBook));
+                .isThrownBy(() -> libraryManager.borrowItem(customer, borrowBook));
     }
 
     @Test
     public void canReturnBorrowedItem() throws LibraryOperationException {
 
         //Given
-        LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
-        library.borrowItem(customer, borrowBook);
+        LibraryItem borrowBook = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        libraryManager.borrowItem(customer, borrowBook);
 
         //When
-        boolean ret = library.returnItem(borrowBook);
+        boolean ret = libraryManager.returnItem(borrowBook);
 
         //Then
         assertThat(ret)
@@ -151,11 +151,11 @@ public class LibraryIntegrationTest {
     public void canNotReturnUnBorrowedItem() throws LibraryItemNotFoundException {
 
         //Given
-        LibraryItem borrowBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        LibraryItem borrowBook = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //Then
         Assertions.assertThatExceptionOfType(LibraryOperationException.class)
-                .isThrownBy(() -> library.returnItem(borrowBook));
+                .isThrownBy(() -> libraryManager.returnItem(borrowBook));
 
         //When
         assertThat(borrowBook)
@@ -166,15 +166,15 @@ public class LibraryIntegrationTest {
     @Test
     public void canGetOverDueItems() throws LibraryItemNotLoanableException, LibraryItemNotFoundException {
         //Given
-        LibraryItem borrowBook1 = library.getItemByLibraryId(1);
-        LibraryItem borrowBook2 = library.getItemByLibraryId(2);
+        LibraryItem borrowBook1 = libraryManager.getItemByLibraryId(1);
+        LibraryItem borrowBook2 = libraryManager.getItemByLibraryId(2);
 
         //When
-        library.borrowItem(customer, borrowBook1);
-        library.borrowItem(customer, borrowBook2);
+        libraryManager.borrowItem(customer, borrowBook1);
+        libraryManager.borrowItem(customer, borrowBook2);
 
         //Then
-        assertThat(library.getOverDueItems())
+        assertThat(libraryManager.getOverDueItems())
                 .isEmpty();
     }
 
@@ -183,16 +183,16 @@ public class LibraryIntegrationTest {
 
         //Given
         dataService.reloadDataStore();
-        LibraryItem borrowSoftwareBook = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
-        LibraryItem borrowJavaBook = library.getItemByTitleAndType("Java Concurrency In Practice", ItemType.BOOK);
-        LibraryItem borrowHackersVhs = library.getItemByTitleAndType("Hackers", ItemType.VHS);
+        LibraryItem borrowSoftwareBook = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        LibraryItem borrowJavaBook = libraryManager.getItemByTitleAndType("Java Concurrency In Practice", ItemType.BOOK);
+        LibraryItem borrowHackersVhs = libraryManager.getItemByTitleAndType("Hackers", ItemType.VHS);
 
-        library.borrowItem(customer, borrowSoftwareBook);
-        library.borrowItem(customer, borrowJavaBook);
-        library.borrowItem(customer, borrowHackersVhs);
+        libraryManager.borrowItem(customer, borrowSoftwareBook);
+        libraryManager.borrowItem(customer, borrowJavaBook);
+        libraryManager.borrowItem(customer, borrowHackersVhs);
 
         //When
-        List<Loan> loans = library.getItemBorrowedByUser(customer);
+        List<Loan> loans = libraryManager.getItemBorrowedByUser(customer);
 
         //Then
         assertThat(loans)
@@ -205,10 +205,10 @@ public class LibraryIntegrationTest {
     @Test
     public void canCheckBookAvailable() throws LibraryItemNotFoundException {
         //Given
-        LibraryItem book = library.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
+        LibraryItem book = libraryManager.getItemByTitleAndType("The Pragmatic Programmer", ItemType.BOOK);
 
         //When
-        boolean available = library.isBookAvailable(book);
+        boolean available = libraryManager.isBookAvailable(book);
 
         //Then
         assertThat(available)

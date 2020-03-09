@@ -238,10 +238,6 @@ public class CSVDataServiceTest {
         verify(dataStore, atMost(INVOKED_TWICE)).getLoans();
     }
 
-    @Test
-    public void isBorrowed() {
-    }
-
     private ConcurrentMap<Integer, LibraryItem> getLibraryItemMap() {
 
         ConcurrentMap<Integer, LibraryItem> libItems = new ConcurrentHashMap<>();

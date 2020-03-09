@@ -1,4 +1,4 @@
-package com.citylibrary;
+package com.citylibrary.manager;
 
 import com.citylibrary.businessexception.LibraryItemNotFoundException;
 import com.citylibrary.businessexception.LibraryItemNotLoanableException;
@@ -22,22 +22,23 @@ import java.util.stream.Collectors;
 import static com.citylibrary.constant.Constant.LOAN_PERIOD;
 
 @Component
-public final class Library {
+public final class LibraryManager {
 
 
     private final DataService dataService;
     private final LendingService lendingService;
-    private static final Logger logger = LoggerFactory.getLogger(Library.class);
+    private static final Logger logger = LoggerFactory.getLogger(LibraryManager.class);
 
     // constructor injection gives an opportunity to mock and run unit tests outside spring framework
     @Autowired
-    public Library(final DataService dataService, final LendingService lendingService) {
+    public LibraryManager(final DataService dataService, final LendingService lendingService) {
         this.dataService = dataService;
         this.lendingService = lendingService;
     }
 
     public boolean borrowItem(final Person customer, final LibraryItem item) throws
             LibraryItemNotLoanableException, LibraryItemNotFoundException {
+        logger.debug("borrowItem was called with parameters Customer: " + customer + " and LibraryItem: " + item);
         if (customer == null || item == null) {
             String msg = "One or  more invalid method parameter(s) passed to borrowItem. customer and item cannot be null";
             logger.error(msg);
@@ -51,6 +52,7 @@ public final class Library {
     }
 
     public boolean returnItem(final LibraryItem item) throws LibraryOperationException {
+        logger.debug("returnItem was called with parameter LibraryItem: " + item);
         if (item == null) {
             String msg = "One or  more invalid method parameter(s) passed to returnItem. Item cannot be null";
             logger.error(msg);
@@ -68,6 +70,7 @@ public final class Library {
     }
 
     public List<Loan> getItemBorrowedByUser(final Person customer) {
+        logger.debug("getItemBorrowedByUser was called with parameter Customer: " + customer);
         if (customer == null) {
             String msg = "One or  more invalid method parameter(s) passed to getItemBorrowedByUser. customer cannot be null";
             logger.error(msg);
@@ -91,6 +94,7 @@ public final class Library {
     }
 
     public boolean isBookAvailable(final LibraryItem libraryItem) {
+        logger.debug("isBookAvailable was called with parameter LibraryItem: " + libraryItem);
         if (libraryItem == null) {
             String msg = "One or  more invalid method parameter(s) passed to libraryItem. libraryItem cannot be null";
             logger.error(msg);
@@ -104,6 +108,7 @@ public final class Library {
     }
 
     public LibraryItem getItemByTitleAndType(final String title, final ItemType itemType) throws LibraryItemNotFoundException {
+        logger.debug("getItemByTitleAndType was called with parameters title: " + title + " ItemType: " + itemType);
         if (title == null || itemType == null) {
             String msg = "One or  more invalid method parameter(s) passed to getItemByTitleAndType. title and itemType cannot be null";
             logger.error(msg);
@@ -124,7 +129,15 @@ public final class Library {
         return foundItem.get();
     }
 
-    public LibraryItem getItemByLibraryId(final int libraryId) {
-        return dataService.getItemsByLibraryId(libraryId);
+    public LibraryItem getItemByLibraryId(final int libraryId) throws LibraryItemNotFoundException {
+        logger.debug("getItemByLibraryId was called with parameters libraryId: " + libraryId);
+        LibraryItem item = dataService.getItemsByLibraryId(libraryId);
+
+        if (item == null) {
+            String msg = "Requested item with id" + libraryId + " not found";
+            logger.info(msg);
+            throw new LibraryItemNotFoundException(msg);
+        }
+        return item;
     }
 }

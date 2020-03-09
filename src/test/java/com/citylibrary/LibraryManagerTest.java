@@ -5,6 +5,7 @@ import com.citylibrary.businessexception.LibraryItemNotLoanableException;
 import com.citylibrary.businessexception.LibraryOperationException;
 import com.citylibrary.enums.ItemType;
 import com.citylibrary.enums.Status;
+import com.citylibrary.manager.LibraryManager;
 import com.citylibrary.model.actor.Customer;
 import com.citylibrary.model.actor.Person;
 import com.citylibrary.model.item.LibraryItem;
@@ -27,14 +28,14 @@ import static com.citylibrary.constant.TestConstants.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class LibraryTest {
+public class LibraryManagerTest {
 
     @Mock
     private DataService mockDataService;
     @Mock
     private LendingService mockLendingService;
     @InjectMocks
-    private Library library;
+    private LibraryManager libraryManager;
 
     private List<LibraryItem> items;
     private List<Loan> loans;
@@ -69,7 +70,7 @@ public class LibraryTest {
         when(mockDataService.getCurrentInventory()).thenReturn(items);
 
         //When
-        List<LibraryItem> currentInventory = library.getCurrentInventory();
+        List<LibraryItem> currentInventory = libraryManager.getCurrentInventory();
 
         //Then
         Assertions.assertThat(currentInventory)
@@ -87,7 +88,7 @@ public class LibraryTest {
         when(mockDataService.getCurrentLoanableInventory()).thenReturn(items);
 
         //When
-        List<LibraryItem> currentInventory = library.getCurrentLoanableInventory();
+        List<LibraryItem> currentInventory = libraryManager.getCurrentLoanableInventory();
 
         //Then
         Assertions.assertThat(currentInventory)
@@ -105,7 +106,7 @@ public class LibraryTest {
         when(mockDataService.getCurrentInventory()).thenReturn(Collections.emptyList());
 
         //When
-        List<LibraryItem> currentInventory = library.getCurrentInventory();
+        List<LibraryItem> currentInventory = libraryManager.getCurrentInventory();
 
         //Then
         Assertions.assertThat(currentInventory)
@@ -125,7 +126,7 @@ public class LibraryTest {
         when(mockLendingService.borrowItem(customer, item, today, dueDate)).thenReturn(true);
 
         //When
-        boolean success = library.borrowItem(customer, item);
+        boolean success = libraryManager.borrowItem(customer, item);
 
         //Then
         Assertions.assertThat(success)
@@ -149,7 +150,7 @@ public class LibraryTest {
         when(mockLendingService.borrowItem(customer, frozenCD, today, dueDate)).thenReturn(false);
 
         //When
-        boolean success = library.borrowItem(customer, frozenCD);
+        boolean success = libraryManager.borrowItem(customer, frozenCD);
 
         //Then
         Assertions.assertThat(success)
@@ -167,7 +168,7 @@ public class LibraryTest {
         when(mockLendingService.returnItem(item)).thenReturn(true);
 
         //When
-        boolean success = library.returnItem(item);                         // checks success flag for true
+        boolean success = libraryManager.returnItem(item);                         // checks success flag for true
 
         //Then
         Assertions.assertThat(success)
@@ -184,7 +185,7 @@ public class LibraryTest {
         when(mockDataService.getLoan()).thenReturn(loans);
 
         //When
-        List<Loan> overDueItems = library.getOverDueItems();
+        List<Loan> overDueItems = libraryManager.getOverDueItems();
 
         //Then
         Assertions.assertThat(overDueItems)
@@ -202,7 +203,7 @@ public class LibraryTest {
         when(mockDataService.getLoan()).thenReturn(loans);
 
         //When
-        List<Loan> borrowedItems = library.getItemBorrowedByUser(customerOne);
+        List<Loan> borrowedItems = libraryManager.getItemBorrowedByUser(customerOne);
 
         //Then
         Assertions.assertThat(borrowedItems)
@@ -222,7 +223,7 @@ public class LibraryTest {
         LibraryItem availableBook = items.get(0);
 
         //When
-        boolean isBookAvailable = library.isBookAvailable(availableBook);
+        boolean isBookAvailable = libraryManager.isBookAvailable(availableBook);
 
 
         //Then
